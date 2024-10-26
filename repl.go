@@ -12,14 +12,11 @@ func cleanInput(input string) []string {
 	return strings.Fields(lowered)
 }
 
-func runRepl() {
-	c := config{
-		Next:     "https://pokeapi.co/api/v2/location-area",
-		Previous: "",
-	}
+func runRepl(c *config) {
+	scanner := bufio.NewScanner(os.Stdin)
+
 	for {
 		fmt.Print("Pokedex > ")
-		scanner := bufio.NewScanner(os.Stdin)
 		scanner.Scan()
 		userInput := scanner.Text()
 		cleanedInput := cleanInput(userInput)
@@ -34,7 +31,7 @@ func runRepl() {
 			fmt.Println(userCommand, "is not a command")
 			continue
 		}
-		err := command.callback(&c)
+		err := command.callback(c)
 		if err != nil {
 			fmt.Printf("%v", err)
 			return

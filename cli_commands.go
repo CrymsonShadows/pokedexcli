@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -9,8 +8,9 @@ import (
 )
 
 type config struct {
-	Next     string
-	Previous string
+	pokeapiCLient   pokeapi.Client
+	nextLocationURL string
+	prevLocationURL string
 }
 
 type cliCommand struct {
@@ -61,44 +61,40 @@ func commandExit(c *config) error {
 }
 
 func commandMapNext(c *config) error {
-	if len(c.Next) == 0 {
+	if len(c.nextLocationURL) == 0 {
 		fmt.Println("There are no further locations.")
+		return nil
 	}
-	locData, err := pokeapi.GetPokeData(c.Next)
+
+	locations, err := c.pokeapiCLient.ListLocations(c.nextLocationURL)
 	if err != nil {
 		return fmt.Errorf("error getting location data from pokeapi: %w", err)
 	}
-	locations := pokeapi.Location{}
-	err = json.Unmarshal(locData, &locations)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling pokeapi location json: %w", err)
-	}
+
 	for _, loc := range locations.Results {
 		fmt.Println(loc.Name)
 	}
-	c.Next = locations.Next
-	c.Previous = locations.Previous
+	c.nextLocationURL = locations.Next
+	c.prevLocationURL = locations.Previous
 	return nil
 }
 
 func commandMapPrevious(c *config) error {
-	if len(c.Previous) == 0 {
+	if len(c.prevLocationURL) == 0 {
 		fmt.Println("There are no locations behind.")
 		return nil
 	}
-	locData, err := pokeapi.GetPokeData(c.Previous)
+
+	locations, err := c.pokeapiCLient.ListLocations(c.prevLocationURL)
 	if err != nil {
 		return fmt.Errorf("error getting location data from pokeapi: %w", err)
 	}
-	locations := pokeapi.Location{}
-	err = json.Unmarshal(locData, &locations)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling pokeapi location json: %w", err)
-	}
+
 	for _, loc := range locations.Results {
 		fmt.Println(loc.Name)
 	}
-	c.Next = locations.Next
-	c.Previous = locations.Previous
+
+	c.nextLocationURL = locations.Next
+	c.prevLocationURL = locations.Previous
 	return nil
 }
