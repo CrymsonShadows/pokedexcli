@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 
@@ -37,6 +36,11 @@ func getCommands() map[string]cliCommand {
 			description: "Displays the names of 20 location areas in the Pokemon world. Each subsequent call to map should display the next 20 locations.",
 			callback:    commandMapNext,
 		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the names of the 20 previous location areas in the Pokemon world. Each subsequent call to mapb should display the previous 20 locations.",
+			callback:    commandMapPrevious,
+		},
 	}
 }
 
@@ -58,9 +62,31 @@ func commandExit(c *config) error {
 
 func commandMapNext(c *config) error {
 	if len(c.Next) == 0 {
-		return errors.New("there are no further locations")
+		fmt.Println("There are no further locations.")
 	}
 	locData, err := pokeapi.GetPokeData(c.Next)
+	if err != nil {
+		return fmt.Errorf("error getting location data from pokeapi: %w", err)
+	}
+	locations := pokeapi.Location{}
+	err = json.Unmarshal(locData, &locations)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling pokeapi location json: %w", err)
+	}
+	for _, loc := range locations.Results {
+		fmt.Println(loc.Name)
+	}
+	c.Next = locations.Next
+	c.Previous = locations.Previous
+	return nil
+}
+
+func commandMapPrevious(c *config) error {
+	if len(c.Previous) == 0 {
+		fmt.Println("There are no locations behind.")
+		return nil
+	}
+	locData, err := pokeapi.GetPokeData(c.Previous)
 	if err != nil {
 		return fmt.Errorf("error getting location data from pokeapi: %w", err)
 	}
