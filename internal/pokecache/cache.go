@@ -7,6 +7,7 @@ import (
 
 func NewCache(interval time.Duration) Cache {
 	cache := Cache{
+		cache:    make(map[string]cacheEntry),
 		mu:       &sync.Mutex{},
 		interval: interval,
 	}
