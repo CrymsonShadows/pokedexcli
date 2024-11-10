@@ -16,7 +16,7 @@ type config struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(c *config) error
+	callback    func(c *config, parameters ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -44,7 +44,7 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func commandHelp(c *config) error {
+func commandHelp(c *config, parameters ...string) error {
 	fmt.Print("Welcome to the Pokedex!\nUsage:\n")
 	fmt.Println()
 	cliCommands := getCommands()
@@ -55,12 +55,12 @@ func commandHelp(c *config) error {
 	return nil
 }
 
-func commandExit(c *config) error {
+func commandExit(c *config, parameters ...string) error {
 	os.Exit(0)
 	return nil
 }
 
-func commandMapNext(c *config) error {
+func commandMapNext(c *config, parameters ...string) error {
 	if len(c.nextLocationURL) == 0 {
 		fmt.Println("There are no further locations.")
 		return nil
@@ -79,7 +79,7 @@ func commandMapNext(c *config) error {
 	return nil
 }
 
-func commandMapPrevious(c *config) error {
+func commandMapPrevious(c *config, parameters ...string) error {
 	if len(c.prevLocationURL) == 0 {
 		fmt.Println("There are no locations behind.")
 		return nil
