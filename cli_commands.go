@@ -41,6 +41,11 @@ func getCommands() map[string]cliCommand {
 			description: "Displays the names of the 20 previous location areas in the Pokemon world. Each subsequent call to mapb should display the previous 20 locations.",
 			callback:    commandMapPrevious,
 		},
+		"explore": {
+			name:        "explore",
+			description: "See the list of Pokemon you can encounter in the given area",
+			callback:    commandExplore,
+		},
 	}
 }
 
@@ -96,5 +101,9 @@ func commandMapPrevious(c *config, parameters ...string) error {
 
 	c.nextLocationURL = locations.Next
 	c.prevLocationURL = locations.Previous
+	return nil
+}
+
+func commandExplore(c *config, parameters ...string) error {
 	return nil
 }
