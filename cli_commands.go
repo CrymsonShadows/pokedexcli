@@ -110,10 +110,12 @@ func commandExplore(c *config, parameters ...string) error {
 		return nil
 	}
 	locationArea := parameters[1]
-	pokeEncounters, err := c.pokeapiCLient.LocationEncounters(locationArea)
+	locationAreaDetails, err := c.pokeapiCLient.GetLocationAreaDetails(locationArea)
 	if err != nil {
-		return fmt.Errorf("error getting pokemon encounter data from pokeapi: %w", err)
+		return fmt.Errorf("error getting location area details from pokeapi: %w", err)
 	}
+
+	pokeEncounters := locationAreaDetails.PokemonEncounters
 
 	fmt.Printf("Exploring %s...\n", locationArea)
 	if len(pokeEncounters) == 0 {
