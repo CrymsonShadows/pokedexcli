@@ -31,7 +31,7 @@ func runRepl(c *config) {
 			fmt.Println(userCommand, "is not a command")
 			continue
 		}
-		err := command.callback(c)
+		err := command.callback(c, cleanedInput...)
 		if err != nil {
 			fmt.Printf("%v", err)
 			return
