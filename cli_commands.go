@@ -105,5 +105,20 @@ func commandMapPrevious(c *config, parameters ...string) error {
 }
 
 func commandExplore(c *config, parameters ...string) error {
+	locationArea := parameters[0]
+	pokeEncounters, err := c.pokeapiCLient.LocationEncounters(locationArea)
+	if err != nil {
+		return fmt.Errorf("error getting pokemon encounter data from pokeapi: %w", err)
+	}
+
+	fmt.Printf("Exploring %s\n", locationArea)
+	if len(pokeEncounters) == 0 {
+		fmt.Println("No Pokemon found")
+	} else {
+		fmt.Println("Found Pokemon:")
+		for _, encounter := range pokeEncounters {
+			fmt.Println(encounter.Pokemon.Name)
+		}
+	}
 	return nil
 }
