@@ -12,6 +12,7 @@ func main() {
 	c := &config{
 		pokeapiCLient:   pokeClient,
 		nextLocationURL: "https://pokeapi.co/api/v2/location-area",
+		pokedex:         make(map[string]pokeapi.Pokemon),
 	}
 
 	runRepl(c)

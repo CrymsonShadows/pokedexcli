@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 
 	pokeapi "github.com/CrymsonShadows/pokedexcli/internal/pokeAPI"
@@ -9,6 +10,7 @@ import (
 
 type config struct {
 	pokeapiCLient   pokeapi.Client
+	pokedex         map[string]pokeapi.Pokemon
 	nextLocationURL string
 	prevLocationURL string
 }
@@ -45,6 +47,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "See the list of Pokemon you can encounter in the given area",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Try to catch the given Pokemon and add them to your Pokedex",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -125,6 +132,28 @@ func commandExplore(c *config, parameters ...string) error {
 		for _, encounter := range pokeEncounters {
 			fmt.Printf(" - %s\n", encounter.Pokemon.Name)
 		}
+	}
+	return nil
+}
+
+func commandCatch(c *config, parameters ...string) error {
+	if len(parameters) != 2 {
+		fmt.Println("catch command needs 1 pokemon to be provided")
+		return nil
+	}
+	pokemonName := parameters[1]
+	pokemonDetails, err := c.pokeapiCLient.GetPokemonDetails(pokemonName)
+	if err != nil {
+		return fmt.Errorf("error getting pokemon details from pokeapi: %w", err)
+	}
+
+	chance := pokemonDetails.BaseExperience / 20
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonDetails.Name)
+	if randInt := rand.Intn(chance); randInt == 0 {
+		c.pokedex[pokemonDetails.Name] = pokemonDetails
+		fmt.Printf("%s was caught!\n", pokemonDetails.Name)
+	} else {
+		fmt.Printf("%s escaped!\n", pokemonDetails.Name)
 	}
 	return nil
 }
